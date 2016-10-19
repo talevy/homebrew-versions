@@ -19,14 +19,15 @@ class Gcc44 < Formula
     `uname -r`.chomp
   end
 
+  desc "GNU compiler collection"
   homepage "https://gcc.gnu.org"
-  url "http://ftpmirror.gnu.org/gcc/gcc-4.4.7/gcc-4.4.7.tar.bz2"
+  url "https://ftpmirror.gnu.org/gcc/gcc-4.4.7/gcc-4.4.7.tar.bz2"
   mirror "https://ftp.gnu.org/gnu/gcc/gcc-4.4.7/gcc-4.4.7.tar.bz2"
-  sha1 "a6c834b0c2f58583da1d093de7a81a20ede9af75"
+  sha256 "5ff75116b8f763fa0fb5621af80fc6fb3ea0f1b1a57520874982f03f26cd607f"
 
   bottle do
-    sha1 "4b45d8a3814a3a4d9c32701f532b3a943d43203a" => :mavericks
-    sha1 "11c4280c78346bbab3dfaef302d5a93188a28b33" => :mountain_lion
+    sha256 "361c84608ef1ddaca2f9a3996aeface6bb08f4525388c563a09b8f20fcd40386" => :mavericks
+    sha256 "c5a7a27d0bfc30a3e6ecce048c786cefa7e3bb4038ad6ea3fdeeb3c6e6454bd1" => :mountain_lion
   end
 
   option "with-fortran", "Build the gfortran compiler"
@@ -51,7 +52,7 @@ class Gcc44 < Formula
   # Fix libffi for ppc, from MacPorts
   patch :p0 do
     url "https://trac.macports.org/export/110576/trunk/dports/lang/gcc44/files/ppc_fde_encoding.diff"
-    sha1 "49e335d085567467155ea6512ffa959a18eab0ef"
+    sha256 "9c5f6fd30d089e97e0364af322272bb06f3d107f357d2b621503ebfbbb4a5af7"
   end
 
   fails_with :llvm
@@ -135,9 +136,9 @@ class Gcc44 < Formula
       if build.with? "profiled-build"
         # Takes longer to build, may bug out. Provided for those who want to
         # optimise all the way to 11.
-        system "make #{make_flags} profiledbootstrap"
+        system "make", make_flags, "profiledbootstrap"
       else
-        system "make #{make_flags} bootstrap"
+        system "make", make_flags, "bootstrap"
       end
 
       # At this point `make check` could be invoked to run the testsuite. The

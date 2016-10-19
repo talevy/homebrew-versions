@@ -1,14 +1,15 @@
 class Libuv0 < Formula
+  desc "Multi-platform library with a focus on async I/O"
   homepage "https://github.com/libuv/libuv"
   url "https://github.com/libuv/libuv/archive/v0.10.36.tar.gz"
-  sha1 "0991836d1dbf9419f448bc3459559181505e29c5"
+  sha256 "421087044cab642f038c190f180d96d6a1157be89adb4630881930495b8f5228"
   head "https://github.com/libuv/libuv.git", :branch => "v0.10"
 
   bottle do
     cellar :any
-    sha1 "49427a8c4ba598d11867e33ff05f304f61cceab8" => :yosemite
-    sha1 "eb147122bbabb9e35df0a77f795dd9899ba5320c" => :mavericks
-    sha1 "e47ad07dda7d4e2c33212ae2c458192263919365" => :mountain_lion
+    sha256 "e7a173640b0f90da34df18c251169d34ee30b178079c3955affc0efe5bc72366" => :yosemite
+    sha256 "842d80e7f5b74339cc0d7bda1019265c87dcb30b9a939cac7fbf6794df9a0726" => :mavericks
+    sha256 "5069cef8166c12abc3cf4a730f9d37d3d3b33949844dd11b9e8a62e4aeae19ca" => :mountain_lion
   end
 
   conflicts_with "libuv"

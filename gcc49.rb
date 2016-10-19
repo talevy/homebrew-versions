@@ -21,17 +21,17 @@ class Gcc49 < Formula
 
   desc "The GNU Compiler Collection"
   homepage "https://gcc.gnu.org"
-  url "http://ftpmirror.gnu.org/gcc/gcc-4.9.3/gcc-4.9.3.tar.bz2"
+  url "https://ftpmirror.gnu.org/gcc/gcc-4.9.3/gcc-4.9.3.tar.bz2"
   mirror "https://ftp.gnu.org/gnu/gcc/gcc-4.9.3/gcc-4.9.3.tar.bz2"
   sha256 "2332b2a5a321b57508b9031354a8503af6fdfb868b8c1748d33028d100a8b67e"
 
   head "svn://gcc.gnu.org/svn/gcc/branches/gcc-4_9-branch"
 
   bottle do
-    revision 1
-    sha256 "297b569c6e6992bee96c04c942d2f077665202a9464f9148fc67df358f04edf2" => :el_capitan
-    sha256 "b90f5d13eb7ac46bc4ae1af61c18b2d1889c55a8280af7205a43d73289c7b659" => :yosemite
-    sha256 "37073298a16b73d5c89ef34954cc52df2f3788d400fa6748a25516bac244306e" => :mavericks
+    rebuild 3
+    sha256 "0acf2b010e3c2210fcb5fdc03de9dc14f0556cf5295347d8f72f2d8d1cfab4ff" => :el_capitan
+    sha256 "5b635a24e9f7464fb94d2933b00a8d1b1cfc0efb1de140fe568e313d24965140" => :yosemite
+    sha256 "dc24f86a9652fbb0ec0bc9dd0103d23bb68c315bd490ee5d0b10a7144453ecc4" => :mavericks
   end
 
   if MacOS.version >= :yosemite
@@ -41,9 +41,15 @@ class Gcc49 < Formula
       url "https://gcc.gnu.org/bugzilla/attachment.cgi?id=35773"
       sha256 "db4966ade190fff4ed39976be8d13e84839098711713eff1d08920d37a58f5ec"
     end
+    # Fixes assembler generation with XCode 7
+    # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66509
+    patch do
+      url "https://gist.githubusercontent.com/tdsmith/d248e025029add31e7aa/raw/444e292786df41346a3a1cc6267bba587408a007/gcc.diff"
+      sha256 "636b65a160ccb7417cc4ffc263fc815382f8bb895e32262205cd10d65ea7804a"
+    end
   end
 
-  option "with-fortran", "Build the gfortran compiler"
+  option "without-fortran", "Build without the gfortran compiler"
   option "with-java", "Build the gcj compiler"
   option "with-all-languages", "Enable all compilers and languages, except Ada"
   option "with-nls", "Build with native language support (localization)"
@@ -51,7 +57,6 @@ class Gcc49 < Formula
   # enabling multilib on a host that can't run 64-bit results in build failures
   option "without-multilib", "Build without multilib support" if MacOS.prefer_64_bit?
 
-  deprecated_option "enable-fortran" => "with-fortran"
   deprecated_option "enable-java" => "with-java"
   deprecated_option "enable-all-languages" => "with-all-languages"
   deprecated_option "enable-nls" => "with-nls"

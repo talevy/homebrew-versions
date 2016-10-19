@@ -1,13 +1,15 @@
 class Libpng12 < Formula
+  desc "Library for manipulating PNG images"
   homepage "http://www.libpng.org/pub/png/libpng.html"
-  url "https://downloads.sourceforge.net/project/libpng/libpng12/1.2.52/libpng-1.2.52.tar.xz"
-  sha256 "d4fb0fbf14057ad6d0319034188fc2aecddb493da8e3031b7b072ed28f510ec0"
+  url "ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng12/libpng-1.2.54.tar.xz"
+  mirror "https://dl.bintray.com/homebrew/mirror/libpng-1.2.54.tar.xz"
+  sha256 "cf85516482780f2bc2c5b5073902f12b1519019d47bf473326c2018bdff1d272"
 
   bottle do
     cellar :any
-    sha256 "5dce4e061796e9ba41112b3f0dfd2ede83eff085e2c5fa19ceb5839a63867a41" => :yosemite
-    sha256 "88360558925258c5d2701088de404ac253952e572ed1917f3e6281f3b04d6732" => :mavericks
-    sha256 "37b4c67b1a155c392fe0813924b8e8bae8eb0bce565bf70003d712a7a28bd41e" => :mountain_lion
+    sha256 "2107dbd088fdca3d22309544ab274ace0b8faaf543c04eae04aa07fcc0d37ac9" => :el_capitan
+    sha256 "4c63b890aaede4ff236c566f0849d0b555daaf62381107ea7bd04e8287cd91cb" => :yosemite
+    sha256 "ca5fbfd49eec9613db17ad8d142011780500e419ac3ebd4c5c73753774ce842b" => :mavericks
   end
 
   keg_only :provided_by_osx

@@ -1,5 +1,7 @@
 class Gdal111 < Formula
+  desc "GDAL: Geospatial Data Abstraction Library"
   homepage "http://www.gdal.org/"
+  revision 1
 
   stable do
     url "http://download.osgeo.org/gdal/1.11.1/gdal-1.11.1.tar.gz"
@@ -16,9 +18,9 @@ class Gdal111 < Formula
   end
 
   bottle do
-    sha256 "d08566f01643c65667522d287fa57b6bc3fb57ae64e4e3cc28d77e5d90b09f3f" => :yosemite
-    sha256 "da2e1aa7e76345c2b37e30597252c3e26ac66cbc9f88a9a706cbf1a86691df9d" => :mavericks
-    sha256 "ed26f48d1045fadca9eae03442470b996deb7ae6cf7ded44ded9e095bfa25544" => :mountain_lion
+    sha256 "438b85eda6978c38b0414885bb8d8584a9d9a95077ea6e761f516b0a83a489c2" => :sierra
+    sha256 "2cd0f0de91d8216b5435d4073b71232c1d6b58bd72f47750ef323044ecf01aa0" => :el_capitan
+    sha256 "edb87e84e3201ef68b90910f9d50c4b906c2384fe118a0b9652699b0850d133a" => :yosemite
   end
 
   option "with-complete", "Use additional Homebrew libraries to provide more drivers."
@@ -160,8 +162,8 @@ class Gdal111 < Formula
       supported_backends.delete "liblzma"
       args << "--with-liblzma=yes"
       args.concat supported_backends.map { |b| "--with-" + b + "=" + HOMEBREW_PREFIX }
-    else
-      args.concat supported_backends.map { |b| "--without-" + b } if build.without? "unsupported"
+    elsif build.without? "unsupported"
+      args.concat supported_backends.map { |b| "--without-" + b }
     end
 
     # The following libraries are either proprietary, not available for public
@@ -246,11 +248,11 @@ class Gdal111 < Formula
         # See main `libkml` formula for info on patches
         inreplace "configure.ac", "-Werror", ""
         inreplace "third_party/Makefile.am" do |s|
-          s.sub! /(lib_LTLIBRARIES =) libminizip.la liburiparser.la/, "\\1"
-          s.sub! /(noinst_LTLIBRARIES = libgtest.la libgtest_main.la)/,
-                 "\\1 libminizip.la liburiparser.la"
-          s.sub! /(libminizip_la_LDFLAGS =)/, "\\1 -static"
-          s.sub! /(liburiparser_la_LDFLAGS =)/, "\\1 -static"
+          s.sub!(/(lib_LTLIBRARIES =) libminizip.la liburiparser.la/, "\\1")
+          s.sub!(/(noinst_LTLIBRARIES = libgtest.la libgtest_main.la)/,
+                 "\\1 libminizip.la liburiparser.la")
+          s.sub!(/(libminizip_la_LDFLAGS =)/, "\\1 -static")
+          s.sub!(/(liburiparser_la_LDFLAGS =)/, "\\1 -static")
         end
 
         system "./autogen.sh"
@@ -273,7 +275,7 @@ class Gdal111 < Formula
     ENV["ARCHFLAGS"] = "-arch #{MacOS.preferred_arch}"
 
     # Fix hardcoded mandir: http://trac.osgeo.org/gdal/ticket/5092
-    inreplace "configure", /^mandir='\$\{prefix\}\/man'$/, ""
+    inreplace "configure", %r{^mandir='\$\{prefix\}\/man'$}, ""
 
     # These libs are statically linked in vendored libkml and libkml formula
     inreplace "configure", " -lminizip -luriparser", "" if build.with? "libkml"
@@ -312,7 +314,7 @@ class Gdal111 < Formula
   end
 
   test do
-    system "#{bin}/gdalinfo", "--formats"
-    system "#{bin}/ogrinfo", "--formats"
+    system bin/"gdalinfo", "--formats"
+    system bin/"ogrinfo", "--formats"
   end
 end

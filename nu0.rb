@@ -1,4 +1,5 @@
 class Nu0 < Formula
+  desc "Object-oriented, Lisp-like programming language"
   homepage "http://programming.nu"
   # Upstream link used previously is dead - Using MacPorts mirror instead.
   url "https://distfiles.macports.org/nu/Nu-0.4.0.tgz"
@@ -26,22 +27,22 @@ class Nu0 < Formula
       s.sub!(/^;;\(set @arch '\("i386"\)\)$/, "(set @arch '(\"#{arch}\"))") unless arch.nil?
       s.gsub!('(SH "sudo ', '(SH "') # don't use sudo to install
       s.gsub!('#{@destdir}/Library/Frameworks', '#{@prefix}/Library/Frameworks')
-      s.sub! /^;; source files$/, <<-EOS
-;; source files
-(set @framework_install_path "#{frameworks}")
-EOS
+      s.sub!(/^;; source files$/, <<-EOS.undent)
+        ;; source files
+        (set @framework_install_path "#{frameworks}")
+      EOS
     end
 
     system "make"
     system "./mininush", "tools/nuke"
-    bin.mkdir
-    lib.mkdir
-    include.mkdir
+    bin.mkpath
+    lib.mkpath
+    include.mkpath
     system "./mininush", "tools/nuke", "install"
   end
 
   def caveats
-    if self.installed? and File.exist? frameworks+"Nu.framework"
+    if installed? && File.exist?(frameworks+"Nu.framework")
       return <<-EOS.undent
         Nu.framework was installed to:
           #{frameworks}/Nu.framework
@@ -51,6 +52,6 @@ EOS
           ln -s "#{frameworks}/Nu.framework" /Library/Frameworks
       EOS
     end
-    return nil
+    nil
   end
 end

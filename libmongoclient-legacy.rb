@@ -1,17 +1,15 @@
 class LibmongoclientLegacy < Formula
   homepage "https://www.mongodb.org"
-  url "https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.0.6.tar.gz"
-  sha256 "fcdaade5ec8b32d66021a18ae2f2580f86d26a13a9bf57002e8c174a51637e9c"
+  url "https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz"
+  sha256 "8c52cae798086c3e9d0e6fe488c3378601db858cc71944b6b83440d8b00298f4"
 
   head "https://github.com/mongodb/mongo-cxx-driver.git", :branch => "legacy"
 
   bottle do
-    sha256 "7914c62076e4d4b461ed82f0c44208b8cc22c84e33666915ea6647d13edbd995" => :el_capitan
-    sha256 "94c5aa46b91a696521aa9f941fd3e820559ee388b96aa97d5a4edc77163e88f2" => :yosemite
-    sha256 "0210ee728a5c684368f4ac2f3a1e7dade663995eb464f758c59f0a54bfa69bec" => :mavericks
+    sha256 "9639189d02dd9c71704effdfefa3696f3a95076cc1c91c628940b6ebbe645ccd" => :sierra
+    sha256 "d4beb45e68470497281cddb9ab8f99a74bd91a0fc925d047b968a9db8c0f71c3" => :el_capitan
+    sha256 "f080e21c4c7482d045e30cbd60c190bda7fad3805481c7b8f4f09465718b23e3" => :yosemite
   end
-
-  conflicts_with "libmongoclient", :because => "libmongoclient contains 26compat branch"
 
   option :cxx11
 
@@ -22,6 +20,8 @@ class LibmongoclientLegacy < Formula
   else
     depends_on "boost"
   end
+
+  conflicts_with "libmongoclient", :because => "libmongoclient contains 26compat branch"
 
   def install
     ENV.cxx11 if build.cxx11?

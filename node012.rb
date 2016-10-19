@@ -1,14 +1,14 @@
 class Node012 < Formula
   desc "JavaScript runtime built on Chrome's V8 engine"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v0.12.7/node-v0.12.7.tar.gz"
-  sha256 "b23d64df051c9c969b0c583f802d5d71de342e53067127a5061415be7e12f39d"
-  head "https://github.com/nodejs/node.git", :branch => "v0.12"
+  url "https://nodejs.org/download/release/v0.12.16/node-v0.12.16.tar.xz"
+  sha256 "4ce3a862eb28be752fbd65fe032c1d55cbbc1145af39292766eea701f67ba5f6"
+  head "https://github.com/nodejs/node.git", :branch => "v0.12-staging"
 
   bottle do
-    sha256 "d2e27e5926da5d1db2e1ba0651d2750febe9f669c096ee177b86b388eacedafd" => :el_capitan
-    sha256 "26df02e9ccb4a629f837125ca8c87ccd43a172e94a9c2dea6766ac890530fa10" => :yosemite
-    sha256 "9a2c6d011ecfab64bbd75a3d842770b45285e43f209a49236e5d3b0382208383" => :mavericks
+    sha256 "b061702121f736b35cea35e0fa77554153a87a47b6bd3e3fb2cc050d3ff2fc1f" => :sierra
+    sha256 "f321bac4a63eebe9de7a2a6b7983bcfe7fe8b7d5bd9d3d0ea60cd080a3d13cac" => :el_capitan
+    sha256 "25ed64cab355ab19d9036c3f38a0941cae2989f8c73bb4b9ef049214a85548da" => :yosemite
   end
 
   option "with-debug", "Build with debugger hooks"
@@ -30,8 +30,8 @@ class Node012 < Formula
   end
 
   resource "npm" do
-    url "https://registry.npmjs.org/npm/-/npm-2.14.4.tgz"
-    sha256 "c8b602de5d51f956aa8f9c34d89be38b2df3b7c25ff6588030eb8224b070db27"
+    url "https://registry.npmjs.org/npm/-/npm-2.15.1.tgz"
+    sha256 "e3435100b37379354b899a31d073ef81b8aa7365c52eb138847ecfbf9f01ea93"
   end
 
   def install
@@ -42,7 +42,7 @@ class Node012 < Formula
     if build.with? "openssl"
       args << "--shared-openssl"
     else
-      args << "--without-ssl2" << "--without-ssl3"
+      args << "--without-ssl3"
     end
 
     system "./configure", *args
@@ -55,10 +55,20 @@ class Node012 < Formula
       ENV.prepend_path "PATH", bin
       # set log level temporarily for npm's `make install`
       ENV["NPM_CONFIG_LOGLEVEL"] = "verbose"
+      # unset prefix temporarily for npm's `make install`
+      ENV.delete "NPM_CONFIG_PREFIX"
 
       cd buildpath/"npm_install" do
         system "./configure", "--prefix=#{libexec}/npm"
         system "make", "install"
+        # `package.json` has relative paths to the npm_install directory.
+        # This copies back over the vanilla `package.json` that is expected.
+        # https://github.com/Homebrew/homebrew/issues/46131#issuecomment-157845008
+        cp buildpath/"npm_install/package.json", libexec/"npm/lib/node_modules/npm"
+        # Remove manpage symlinks from the buildpath, they are breaking bottle
+        # creation. The real manpages are living in libexec/npm/lib/node_modules/npm/man/
+        # https://github.com/Homebrew/homebrew/pull/47081#issuecomment-165280470
+        rm_rf libexec/"npm/share/"
       end
 
       if build.with? "completion"
@@ -90,8 +100,8 @@ class Node012 < Formula
     ["man1", "man3", "man5", "man7"].each do |man|
       # Dirs must exist first: https://github.com/Homebrew/homebrew/issues/35969
       mkdir_p HOMEBREW_PREFIX/"share/man/#{man}"
-      rm_f Dir[HOMEBREW_PREFIX/"share/man/#{man}/{npm.,npm-,npmrc.}*"]
-      ln_sf Dir[libexec/"npm/lib/node_modules/npm/man/#{man}/npm*"], HOMEBREW_PREFIX/"share/man/#{man}"
+      rm_f Dir[HOMEBREW_PREFIX/"share/man/#{man}/{npm.,npm-,npmrc.,package.json.}*"]
+      ln_sf Dir[libexec/"npm/lib/node_modules/npm/man/#{man}/{npm,package.json}*"], HOMEBREW_PREFIX/"share/man/#{man}"
     end
 
     npm_root = node_modules/"npm"
@@ -129,9 +139,8 @@ class Node012 < Formula
     path = testpath/"test.js"
     path.write "console.log('hello');"
 
-    output = `#{bin}/node #{path}`.strip
+    output = shell_output("#{bin}/node #{path}").strip
     assert_equal "hello", output
-    assert_equal 0, $?.exitstatus
 
     if build.with? "npm"
       # make sure npm can find node

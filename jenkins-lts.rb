@@ -1,9 +1,12 @@
 class JenkinsLts < Formula
-  homepage "http://jenkins-ci.org/#stable"
-  url "http://mirrors.jenkins-ci.org/war-stable/1.625.1/jenkins.war"
-  sha256 "e5134146d398f00712c19c69bc84a594509505eec2ba6930f8df41689debfbcb"
+  desc "Extendable open-source CI server"
+  homepage "https://jenkins.io/index.html#stable"
+  url "http://mirrors.jenkins-ci.org/war-stable/2.19.1/jenkins.war"
+  sha256 "eb0484ab9a405d663724ec2a678ee648b7995b7b1b1021bf85dcddf7d2b2f577"
 
-  depends_on :java => "1.6+"
+  bottle :unneeded
+
+  depends_on :java => "1.7+"
 
   conflicts_with "jenkins",
     :because => "both use the same data directory: $HOME/.jenkins"
@@ -13,6 +16,11 @@ class JenkinsLts < Formula
     libexec.install Dir["jenkins.war", "WEB-INF/jenkins-cli.jar"]
     bin.write_jar_script libexec/"jenkins.war", "jenkins-lts"
     bin.write_jar_script libexec/"jenkins-cli.jar", "jenkins-lts-cli"
+  end
+
+  def caveats; <<-EOS.undent
+    Note: When using launchctl the port will be 8080.
+    EOS
   end
 
   plist_options :manual => "jenkins-lts"
@@ -29,7 +37,7 @@ class JenkinsLts < Formula
           <string>/usr/bin/java</string>
           <string>-Dmail.smtp.starttls.enable=true</string>
           <string>-jar</string>
-          <string>#{opt_prefix}/libexec/jenkins.war</string>
+          <string>#{opt_libexec}/jenkins.war</string>
           <string>--httpListenAddress=127.0.0.1</string>
           <string>--httpPort=8080</string>
         </array>
@@ -40,8 +48,21 @@ class JenkinsLts < Formula
     EOS
   end
 
-  def caveats; <<-EOS.undent
-    Note: When using launchctl the port will be 8080.
-    EOS
+  test do
+    ENV["JENKINS_HOME"] = testpath
+    ENV.append "_JAVA_OPTIONS", "-Djava.io.tmpdir=#{testpath}"
+
+    pid = fork do
+      exec "#{bin}/jenkins-lts"
+    end
+    sleep 60
+
+    begin
+      output = shell_output("curl localhost:8080/")
+      assert_match(/Welcome to Jenkins!|Unlock Jenkins|Authentication required/, output)
+    ensure
+      Process.kill("SIGINT", pid)
+      Process.wait(pid)
+    end
   end
 end

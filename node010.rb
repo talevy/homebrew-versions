@@ -2,14 +2,14 @@
 class Node010 < Formula
   desc "Platform built on V8 to build network applications"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v0.10.40/node-v0.10.40.tar.gz"
-  sha256 "bae79c2fd959aebe1629af36077bebbb760128db753da226d2344cd91499149f"
-  revision 1
+  url "https://nodejs.org/dist/v0.10.47/node-v0.10.47.tar.xz"
+  sha256 "335bdf4db702885a8acaf2c9f241c70cabd62497361da81aca65c8e8a8e7ff09"
+  head "https://github.com/nodejs/node.git", :branch => "v0.10-staging"
 
   bottle do
-    sha256 "bbf490a0c3320e14162283df0a74b3200e76feb0d83902702cecc9eb9fc6d56d" => :el_capitan
-    sha256 "2077f70db7eb6e9bea15a9ef7e67ce33568d63e10a00336f8b17432b47c5bf9d" => :yosemite
-    sha256 "7891021bd39c0ec7dcbfd4ca4ae16d927cb4d05fd10a761cf641da5dc15642fb" => :mavericks
+    sha256 "fe2f262c63955708a31aaaea2c96f3e8c68bcbaacdebb6b29c632b724b55d828" => :sierra
+    sha256 "d1b13ac6b8b9987259c1690f11fb4576c95f08a22764942859d94c40c9284745" => :el_capitan
+    sha256 "867ece16b5bcc9ff35515c0c9818ca4fe4bfaa9ccaa82045987cfe2c39c6b30c" => :yosemite
   end
 
   deprecated_option "enable-debug" => "with-debug"
@@ -26,12 +26,11 @@ class Node010 < Formula
   end
 
   resource "npm" do
-    url "https://registry.npmjs.org/npm/-/npm-2.14.4.tgz"
-    sha256 "c8b602de5d51f956aa8f9c34d89be38b2df3b7c25ff6588030eb8224b070db27"
+    url "https://registry.npmjs.org/npm/-/npm-2.15.1.tgz"
+    sha256 "e3435100b37379354b899a31d073ef81b8aa7365c52eb138847ecfbf9f01ea93"
   end
 
-  conflicts_with "node",
-    :because => "Differing versions of the same formulae."
+  conflicts_with "node", :because => "Differing versions of the same formulae."
 
   def install
     args = %W[--prefix=#{prefix} --without-npm]
@@ -40,7 +39,7 @@ class Node010 < Formula
     if build.with? "openssl"
       args << "--shared-openssl"
     else
-      args << "--without-ssl2" << "--without-ssl3"
+      args << "--without-ssl3"
     end
 
     system "./configure", *args
@@ -51,16 +50,22 @@ class Node010 < Formula
 
       # make sure npm can find node
       ENV.prepend_path "PATH", bin
-
-      # make sure user prefix settings in $HOME are ignored
-      ENV["HOME"] = buildpath/".brew_home"
-
       # set log level temporarily for npm's `make install`
       ENV["NPM_CONFIG_LOGLEVEL"] = "verbose"
+      # unset prefix temporarily for npm's `make install`
+      ENV.delete "NPM_CONFIG_PREFIX"
 
       cd buildpath/"npm_install" do
         system "./configure", "--prefix=#{libexec}/npm"
         system "make", "install"
+        # `package.json` has relative paths to the npm_install directory.
+        # This copies back over the vanilla `package.json` that is expected.
+        # https://github.com/Homebrew/homebrew/issues/46131#issuecomment-157845008
+        cp buildpath/"npm_install/package.json", libexec/"npm/lib/node_modules/npm"
+        # Remove manpage symlinks from the buildpath, they are breaking bottle
+        # creation. The real manpages are living in libexec/npm/lib/node_modules/npm/man/
+        # https://github.com/Homebrew/homebrew/pull/47081#issuecomment-165280470
+        rm_rf libexec/"npm/share/"
       end
 
       if build.with? "completion"
@@ -92,8 +97,8 @@ class Node010 < Formula
     ["man1", "man3", "man5", "man7"].each do |man|
       # Dirs must exist first: https://github.com/Homebrew/homebrew/issues/35969
       mkdir_p HOMEBREW_PREFIX/"share/man/#{man}"
-      rm_f Dir[HOMEBREW_PREFIX/"share/man/#{man}/{npm.,npm-,npmrc.}*"]
-      ln_sf Dir[libexec/"npm/lib/node_modules/npm/man/#{man}/npm*"], HOMEBREW_PREFIX/"share/man/#{man}"
+      rm_f Dir[HOMEBREW_PREFIX/"share/man/#{man}/{npm.,npm-,npmrc.,package.json.}*"]
+      ln_sf Dir[libexec/"npm/lib/node_modules/npm/man/#{man}/{npm,package.json}*"], HOMEBREW_PREFIX/"share/man/#{man}"
     end
 
     npm_root = node_modules/"npm"
@@ -119,9 +124,8 @@ class Node010 < Formula
     path = testpath/"test.js"
     path.write "console.log('hello');"
 
-    output = `#{bin}/node #{path}`.strip
+    output = shell_output("#{bin}/node #{path}").strip
     assert_equal "hello", output
-    assert_equal 0, $?.exitstatus
 
     if build.with? "npm"
       # make sure npm can find node

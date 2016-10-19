@@ -21,25 +21,24 @@ class Gcc5 < Formula
 
   desc "The GNU Compiler Collection"
   homepage "https://gcc.gnu.org"
-  url "http://ftpmirror.gnu.org/gcc/gcc-5.2.0/gcc-5.2.0.tar.bz2"
-  mirror "https://ftp.gnu.org/gnu/gcc/gcc-5.2.0/gcc-5.2.0.tar.bz2"
-  sha256 "5f835b04b5f7dd4f4d2dc96190ec1621b8d89f2dc6f638f9f8bc1b1014ba8cad"
+  url "https://ftpmirror.gnu.org/gcc/gcc-5.4.0/gcc-5.4.0.tar.bz2"
+  mirror "https://ftp.gnu.org/gnu/gcc/gcc-5.4.0/gcc-5.4.0.tar.bz2"
+  sha256 "608df76dec2d34de6558249d8af4cbee21eceddbcb580d666f7a5a583ca3303a"
 
   bottle do
-    revision 1
-    sha256 "09db748c41ee76dcb681ce809a23157d1e4ade3260ecb1395f8339faf8db25e9" => :el_capitan
-    sha256 "80a028bf71cbda7b25f53f307b8b706c26b5f0f2ddd4d2b21a48fa33e4c0d8a1" => :yosemite
-    sha256 "6c63eb8bdcbb06806a71bc91d89fa91ceb90154e93bb67bbdfb8bd6ed0ce9a67" => :mavericks
+    sha256 "834b511f2f460db483e8126b446bb0a7fc7e2d7ee16bb53d6c4ec51910ce89be" => :el_capitan
+    sha256 "b44fcce2f25919f93d33fe9482c1f9cc1068e3332f6890340853c32007c0113b" => :yosemite
+    sha256 "7b4970b4c2c86558208476c3e281f242be4f6bfe7c1fa8391e52b9829ef4ba78" => :mavericks
   end
 
   # GCC's Go compiler is not currently supported on Mac OS X.
   # See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46986
-  option "with-fortran", "Build the gfortran compiler"
   option "with-java", "Build the gcj compiler"
   option "with-all-languages", "Enable all compilers and languages, except Ada"
   option "with-nls", "Build with native language support (localization)"
   option "with-profiled-build", "Make use of profile guided optimization when bootstrapping GCC"
   option "with-jit", "Build the jit compiler"
+  option "without-fortran", "Build without the gfortran compiler"
   # enabling multilib on a host that can"t run 64-bit results in build failures
   option "without-multilib", "Build without multilib support" if MacOS.prefer_64_bit?
 

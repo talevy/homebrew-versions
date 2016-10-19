@@ -1,27 +1,28 @@
 class Gmp4 < Formula
-  homepage 'http://gmplib.org/'
+  desc "GNU multiple precision arithmetic library"
+  homepage "http://gmplib.org/"
   # Track gcc infrastructure releases.
-  url 'http://ftpmirror.gnu.org/gmp/gmp-4.3.2.tar.bz2'
-  mirror 'https://ftp.gnu.org/gnu/gmp/gmp-4.3.2.tar.bz2'
-  mirror 'ftp://ftp.gmplib.org/pub/gmp-4.3.2/gmp-4.3.2.tar.bz2'
-  mirror 'ftp://gcc.gnu.org/pub/gcc/infrastructure/gmp-4.3.2.tar.bz2'
-  sha1 'c011e8feaf1bb89158bd55eaabd7ef8fdd101a2c'
+  url "https://ftpmirror.gnu.org/gmp/gmp-4.3.2.tar.bz2"
+  mirror "https://ftp.gnu.org/gnu/gmp/gmp-4.3.2.tar.bz2"
+  mirror "ftp://ftp.gmplib.org/pub/gmp-4.3.2/gmp-4.3.2.tar.bz2"
+  mirror "ftp://gcc.gnu.org/pub/gcc/infrastructure/gmp-4.3.2.tar.bz2"
+  sha256 "936162c0312886c21581002b79932829aa048cfaf9937c6265aeaa14f1cd1775"
 
   bottle do
     cellar :any
-    sha256 "40de88cbcd04d6869051eb8617afbb2e0754f680f6754708652a807349948815" => :yosemite
-    sha256 "7543fa0986dfa81487367b410c178ca581560df39ca53dfc7d66e2c2a4543813" => :mavericks
-    sha256 "6064daffafdeeab54380827aa6da948a47001ef847a28c2edbb0688f54e0a480" => :mountain_lion
-    sha1 'ac18cca84840aac6d004d829bc1cea398ec09487' => :tiger_g3
-    sha1 '33780b658a5f64d220fb64c07d4f6e859ddd94c5' => :tiger_altivec
-    sha1 '71bf67992e28a0b48606db40df70f22d3414c5fd' => :leopard_g3
-    sha1 '480b7c3848b069e0da3bb33331beacf9122baec3' => :leopard_altivec
+    revision 1
+    sha256 "5c5d632ea58479fba37a0844d0b9a4fd1e865e809286ada95d5484d72ab50a78" => :el_capitan
+    sha256 "932a2d0987dd26bbc3cb54b7d38d4cf6b0e5a4bd46fef8442b79b75f067abf6e" => :yosemite
+    sha256 "b7012c46ac9e5b5aa1004184e85a2e99fc047d9f92f1e8b82699ba1f1ea1f7bf" => :mavericks
   end
 
   keg_only "Conflicts with gmp in main repository."
 
-  option '32-bit'
-  option 'skip-check', 'Do not run `make check` to verify libraries'
+  option "with-32-bit"
+  option "without-check", "Do not run `make check` to verify libraries"
+
+  deprecated_option "32-bit" => "with-32-bit"
+  deprecated_option "skip-check" => "without-check"
 
   fails_with :gcc_4_0 do
     cause "Reports of problems using gcc 4.0 on Leopard: https://github.com/mxcl/homebrew/issues/issue/2302"
@@ -36,7 +37,7 @@ class Gmp4 < Formula
     args = ["--prefix=#{prefix}", "--enable-cxx"]
 
     # Build 32-bit where appropriate, and help configure find 64-bit CPUs
-    if MacOS.prefer_64_bit? and not build.build_32_bit?
+    if MacOS.prefer_64_bit? && !build.build_32_bit?
       ENV.m64
       args << "--build=x86_64-apple-darwin"
     else
@@ -47,11 +48,27 @@ class Gmp4 < Formula
     system "./configure", *args
     system "make"
     ENV.j1 # Doesn't install in parallel on 8-core Mac Pro
-    system "make install"
+    system "make", "install"
 
     # Different compilers and options can cause tests to fail even
     # if everything compiles, so yes, we want to do this step.
-    system "make check" unless build.include? "skip-check"
+    system "make", "check" if build.with? "check"
+  end
+
+  test do
+    (testpath/"test.c").write <<-EOS.undent
+      #include <gmp.h>
+
+      int main()
+      {
+        mpz_t integ;
+        mpz_init (integ);
+        mpz_clear (integ);
+        return 0;
+      }
+    EOS
+    system ENV.cc, "test.c", "-L#{lib}", "-lgmp", "-I#{include}", "-o", "test"
+    system "./test"
   end
 end
 

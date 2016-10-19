@@ -1,44 +1,36 @@
 class Mongodb26 < Formula
+  desc "High-performance document-oriented database"
   homepage "https://www.mongodb.org/"
-  url "https://fastdl.mongodb.org/src/mongodb-src-r2.6.10.tar.gz"
-  sha256 "74228a22aaf99570e706ecde20658165e3983ee8a9f327e80974f82a4e819476"
+  url "https://fastdl.mongodb.org/src/mongodb-src-r2.6.12.tar.gz"
+  sha256 "2dd51eabcfcd133573be74c0131c85b67764042833e7d94077e86adc0b9406dc"
 
   bottle do
     cellar :any_skip_relocation
-    revision 1
-    sha256 "5f2e34e3f6a1d3baaba6d07544142f9d9965be14a4b35ea5453ce4c3049d2a94" => :el_capitan
-    sha256 "045396065bbd37697d3a2c71cbfc9f2be49210c660a69719a353396cabfd6e61" => :yosemite
-    sha256 "f16c1cae041a6479bf50bf4a269e4a2097f1fd6cd0a3758ed448294c217e1d6e" => :mavericks
+    sha256 "235b90185354f6cb9274cbc590471c0d4f27a79303b5754eb2e586582a427bef" => :sierra
+    sha256 "1c92e42c7e6c54e5aec5ed89e65507c7ee173eb2d39734d1122467dc3ecc7a83" => :el_capitan
+    sha256 "c81d5e37dc2cef21b4a65ad67c74270dc6cc99a5987c67190c4e1281ebfd4138" => :yosemite
   end
 
   option "with-boost", "Compile using installed boost, not the version shipped with mongodb"
 
-  depends_on "boost" => :optional
   depends_on :macos => :snow_leopard
   depends_on "scons" => :build
+  depends_on "boost" => :optional
   depends_on "openssl" => :optional
 
-  # Review this patch with each release.
-  # This modifies the SConstruct file to include 10.10 and 10.11 as accepted build options.
-  if MacOS.version >= :yosemite
-   patch do
-     url "https://gist.githubusercontent.com/asmarques/4e4e66121dbe46a08933/raw/d6753551ff3849bf0fb5ca87c0a96e1255f4254d/mongodb26-elcapitan.diff"
-     sha256 "2f79588a8a15660908d8d071655541c9ab0ac425550b02dc454c861c75f86606"
-   end
-  end
-
   def install
+    # This modifies the SConstruct file to include 10.10, 10.11, and 10.12 osx versions as accepted build options.
+    inreplace "SConstruct", /osx_version_choices = \[.+?\]/, "osx_version_choices = ['10.6', '10.7', '10.8', '10.9', '10.10', '10.11', '10.12']"
+
     args = %W[
       --prefix=#{prefix}
       -j#{ENV.make_jobs}
       --cc=#{ENV.cc}
       --cxx=#{ENV.cxx}
       --osx-version-min=#{MacOS.version}
+      --full
     ]
 
-    # --full installs development headers and client library, not just binaries
-    # (only supported pre-2.7)
-    args << "--full" if build.stable?
     args << "--use-system-boost" if build.with? "boost"
     args << "--64" if MacOS.prefer_64_bit?
 
@@ -56,8 +48,8 @@ class Mongodb26 < Formula
     (buildpath+"mongod.conf").write mongodb_conf
     etc.install "mongod.conf"
 
-    (var+"mongodb").mkpath
-    (var+"log/mongodb").mkpath
+    (var/"mongodb").mkpath
+    (var/"log/mongodb").mkpath
   end
 
   def mongodb_conf; <<-EOS.undent

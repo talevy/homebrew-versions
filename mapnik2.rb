@@ -3,11 +3,12 @@ class Mapnik2 < Formula
   homepage "http://www.mapnik.org/"
   url "https://s3.amazonaws.com/mapnik/dist/v2.2.0/mapnik-v2.2.0.tar.bz2"
   sha256 "9b30de4e58adc6d5aa8478779d0a47fdabe6bf8b166b67a383b35f5aa5d6c1b0"
+  revision 3
 
   bottle do
-    sha256 "5dfd9531b492ff97578bc0d018d2772409e69371913add52de2cfd292fd5d532" => :yosemite
-    sha256 "59b444b1755a9edf77ed88d8db84cadff4d2f4a80ca90688201e167be0919cc1" => :mavericks
-    sha256 "9cb1eb54e02bd32845a1748d3989b9becd95095cb9a7e8566864c760c49670c8" => :mountain_lion
+    sha256 "bd5985de004f83740308b23eb6e168d61babf6f6150293d0aa87a4f10d117eaa" => :sierra
+    sha256 "24d15c676a305843a7f33ab5239838a48edaa5f9de264858a4ae23642fb40514" => :el_capitan
+    sha256 "0861497b515ce96d66af6ab74c2cef5e4815aa592886668ea32120096fab4db4" => :yosemite
   end
 
   # compile error in bindings/python/mapnik_text_placement.cpp
@@ -28,8 +29,8 @@ class Mapnik2 < Formula
   depends_on "proj"
   depends_on "icu4c"
   depends_on "jpeg"
-  depends_on "boost"
-  depends_on "boost-python"
+  depends_on "boost159"
+  depends_on "boost-python159"
   depends_on "gdal" => :optional
   depends_on "postgresql" => :optional
   depends_on "cairo" => :optional
@@ -39,7 +40,7 @@ class Mapnik2 < Formula
 
   def install
     icu = Formula["icu4c"].opt_prefix
-    boost = Formula["boost"].opt_prefix
+    boost = Formula["boost159"].opt_prefix
     proj = Formula["proj"].opt_prefix
     jpeg = Formula["jpeg"].opt_prefix
     libpng = Formula["libpng"].opt_prefix
@@ -68,8 +69,7 @@ class Mapnik2 < Formula
             "BOOST_LIBS=#{boost}/lib",
             "PROJ_INCLUDES=#{proj}/include",
             "PROJ_LIBS=#{proj}/lib",
-            "FREETYPE_CONFIG=#{freetype}/bin/freetype-config"
-           ]
+            "FREETYPE_CONFIG=#{freetype}/bin/freetype-config"]
 
     if build.with? "cairo"
       args << "CAIRO=True" # cairo paths will come from pkg-config

@@ -1,8 +1,8 @@
 class Elasticsearch17 < Formula
-  desc "Distributed real-time search."
+  desc "Distributed search & analytics engine"
   homepage "https://www.elastic.co/products/elasticsearch"
-  url "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.7.3.tar.gz"
-  sha256 "af517611493374cfb2daa8897ae17e63e2efea4d0377d316baa351c1776a2bca"
+  url "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.7.5.tar.gz"
+  sha256 "0aa58947d66b487488e86059352deb7c6cab5da4accdff043cce9fed7c3d2fa7"
 
   bottle :unneeded
 
@@ -98,9 +98,9 @@ class Elasticsearch17 < Formula
           <key>WorkingDirectory</key>
           <string>#{var}</string>
           <key>StandardErrorPath</key>
-          <string>/dev/null</string>
+          <string>#{var}/log/elasticsearch17.log</string>
           <key>StandardOutPath</key>
-          <string>/dev/null</string>
+          <string>#{var}/log/elasticsearch17.log</string>
         </dict>
       </plist>
     EOS

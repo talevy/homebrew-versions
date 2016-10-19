@@ -1,4 +1,5 @@
 class Libcouchbase1 < Formula
+  desc "C library for Couchbase"
   homepage "http://couchbase.com/develop/c/current"
   url "http://packages.couchbase.com/clients/c/libcouchbase-1.0.6.tar.gz"
   sha256 "ff86530a0fc21a2a6b719b389163a1f5172e379630b7dc91cbd2d16b5d586dc7"
@@ -10,10 +11,10 @@ class Libcouchbase1 < Formula
     sha256 "97c87c221ffdf93a07f03bf7b5ea5007ef17803a27f24d63a78151a27169272f" => :mountain_lion
   end
 
-  conflicts_with "libcouchbase", :because => "Differing versions of the same formula."
-
   depends_on "libevent"
   depends_on "libvbucket"
+
+  conflicts_with "libcouchbase", :because => "Differing versions of the same formula."
 
   def install
     system "./configure", "--disable-debug",

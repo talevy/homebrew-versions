@@ -1,4 +1,5 @@
 class Hive011 < Formula
+  desc "Hadoop-based data summarization, query, and analysis"
   homepage "https://hive.apache.org"
   url "https://archive.apache.org/dist/hive/hive-0.11.0/hive-0.11.0-bin.tar.gz"
   sha256 "c22ee328438e80a8ee4b66979dba69650511a73f8b6edf2d87d93c74283578e5"
@@ -8,7 +9,7 @@ class Hive011 < Formula
 
   def install
     rm_f Dir["bin/*.bat"]
-    libexec.install %w[bin conf examples lib ]
+    libexec.install %w[bin conf examples lib]
     libexec.install Dir["*.jar"]
     bin.write_exec_script Dir["#{libexec}/bin/*"]
   end

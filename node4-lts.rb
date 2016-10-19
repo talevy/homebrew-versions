@@ -1,14 +1,14 @@
 class Node4Lts < Formula
   desc "JavaScript runtime built on Chrome's V8 engine"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v4.2.2/node-v4.2.2.tar.gz"
-  sha256 "00e709353435b436b5bbf5e62272ebb15fe801065422c4c2afe2b93456210cb1"
-  head "https://github.com/nodejs/node.git"
+  url "https://nodejs.org/dist/v4.6.1/node-v4.6.1.tar.xz"
+  sha256 "fe2a85df8758001878abb5bbaf17a6b6cdc12b3e465b1d3bace83b37fdf0345a"
+  head "https://github.com/nodejs/node.git", :branch => "v4.x-staging"
 
   bottle do
-    sha256 "359fa6c65b32804bc80f0d136c6aed5c43761628f50e43a6d9ea3b55c4d12033" => :el_capitan
-    sha256 "2f78efd38d274a9dd265562bb456060f4e9133a23284f18b81bdcec8ea099478" => :yosemite
-    sha256 "6e515b312ee61fb7abbbdffb4256e5b1455e524068f5d68ad99a5a1d3fa3568e" => :mavericks
+    sha256 "82de98d5ca42e5f71fef5c4d5655d37db011d98ad518681bbbdbf64c1a8c9918" => :sierra
+    sha256 "749a25212f0ccbd66a8495ec38c4cc5511a3c8c9f22c7ddb143c1d779b003121" => :el_capitan
+    sha256 "0ec397f44934a7080c7bbfbe294da3b67c471c50f6bb9ec8360d2e5d0e7b7181" => :yosemite
   end
 
   option "with-debug", "Build with debugger hooks"
@@ -27,8 +27,8 @@ class Node4Lts < Formula
   end
 
   resource "npm" do
-    url "https://registry.npmjs.org/npm/-/npm-2.14.7.tgz"
-    sha256 "54f3a5195a1e6b52fc954749e81f8abf1f7c8ca912b90ecf2b33581800d0f6a5"
+    url "https://registry.npmjs.org/npm/-/npm-2.15.9.tgz"
+    sha256 "111243bdcf37c3cc8d16e2e7dc15f5ed422c20a9a7201a1620b3136d1e858081"
   end
 
   resource "icu4c" do
@@ -41,11 +41,13 @@ class Node4Lts < Formula
     args = %W[--prefix=#{prefix} --without-npm]
     args << "--debug" if build.with? "debug"
     args << "--shared-openssl" if build.with? "openssl"
+
     if build.with? "full-icu"
       args << "--with-intl=full-icu"
     else
       args << "--with-intl=small-icu"
     end
+    args << "--tag=head" if build.head?
 
     resource("icu4c").stage buildpath/"deps/icu"
 
@@ -59,10 +61,20 @@ class Node4Lts < Formula
       ENV.prepend_path "PATH", bin
       # set log level temporarily for npm's `make install`
       ENV["NPM_CONFIG_LOGLEVEL"] = "verbose"
+      # unset prefix temporarily for npm's `make install`
+      ENV.delete "NPM_CONFIG_PREFIX"
 
       cd buildpath/"npm_install" do
         system "./configure", "--prefix=#{libexec}/npm"
         system "make", "install"
+        # `package.json` has relative paths to the npm_install directory.
+        # This copies back over the vanilla `package.json` that is expected.
+        # https://github.com/Homebrew/homebrew/issues/46131#issuecomment-157845008
+        cp buildpath/"npm_install/package.json", libexec/"npm/lib/node_modules/npm"
+        # Remove manpage symlinks from the buildpath, they are breaking bottle
+        # creation. The real manpages are living in libexec/npm/lib/node_modules/npm/man/
+        # https://github.com/Homebrew/homebrew/pull/47081#issuecomment-165280470
+        rm_rf libexec/"npm/share/"
       end
 
       if build.with? "completion"
@@ -94,8 +106,8 @@ class Node4Lts < Formula
     ["man1", "man3", "man5", "man7"].each do |man|
       # Dirs must exist first: https://github.com/Homebrew/homebrew/issues/35969
       mkdir_p HOMEBREW_PREFIX/"share/man/#{man}"
-      rm_f Dir[HOMEBREW_PREFIX/"share/man/#{man}/{npm.,npm-,npmrc.}*"]
-      ln_sf Dir[libexec/"npm/lib/node_modules/npm/man/#{man}/npm*"], HOMEBREW_PREFIX/"share/man/#{man}"
+      rm_f Dir[HOMEBREW_PREFIX/"share/man/#{man}/{npm.,npm-,npmrc.,package.json.}*"]
+      ln_sf Dir[libexec/"npm/lib/node_modules/npm/man/#{man}/{npm,package.json}*"], HOMEBREW_PREFIX/"share/man/#{man}"
     end
 
     npm_root = node_modules/"npm"
@@ -123,17 +135,18 @@ class Node4Lts < Formula
 
     output = shell_output("#{bin}/node #{path}").strip
     assert_equal "hello", output
-    output = shell_output("#{bin}/node -e 'console.log(new Intl.NumberFormat().format(1234.56))'").strip
+    output = shell_output("#{bin}/node -e 'console.log(new Intl.NumberFormat(\"en-EN\").format(1234.56))'").strip
     assert_equal "1,234.56", output
 
     if build.with? "npm"
       # make sure npm can find node
       ENV.prepend_path "PATH", opt_bin
+      ENV.delete "NVM_NODEJS_ORG_MIRROR"
       assert_equal which("node"), opt_bin/"node"
       assert (HOMEBREW_PREFIX/"bin/npm").exist?, "npm must exist"
       assert (HOMEBREW_PREFIX/"bin/npm").executable?, "npm must be executable"
       system "#{HOMEBREW_PREFIX}/bin/npm", "--verbose", "install", "npm@latest"
-      system "#{HOMEBREW_PREFIX}/bin/npm", "--verbose", "install", "bignum"
+      system "#{HOMEBREW_PREFIX}/bin/npm", "--verbose", "install", "bignum" unless head?
     end
   end
 end

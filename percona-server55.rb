@@ -1,25 +1,30 @@
 class PerconaServer55 < Formula
+  desc "Drop-in MySQL replacement"
   homepage "http://www.percona.com"
   url "http://www.percona.com/downloads/Percona-Server-5.5/Percona-Server-5.5.41-37.0/source/tarball/percona-server-5.5.41-37.0.tar.gz"
   version "5.5.41-37.0"
-  sha1 "74610892ba6402e8df04320db444d6dcc7cb2fe8"
+  sha256 "4de65ccbdd6c266f18339c2ea5427a15d90a8ce1ce1c7574aa2e72f685a10833"
 
   bottle do
-    sha1 "4c765fa7e77cea212481b9916c140ae7eb7dac9f" => :yosemite
-    sha1 "c03ce1fad24f4aa7574c291ddf28e86695d8c0d5" => :mavericks
-    sha1 "1d2f86b8c062a965a28e246f9d0957855c20b883" => :mountain_lion
+    sha256 "a9eff85dcbcbffa7c6fa5a8fd0f9a4d7d9808938feed226772aabb83c0b26ec6" => :sierra
+    sha256 "436238fe2ffe73a09c5452a4d8997d390e9592d6936a4d8f2a1525cc5d03f468" => :el_capitan
+    sha256 "cf933e833ac7235bdabfe87f1e29f72f85e489f3c13c80ce94854147ff6eaccc" => :yosemite
   end
 
-  depends_on "cmake" => :build
-  depends_on "readline"
-  depends_on "pidof"
-  depends_on "openssl"
+  revision 1
 
   option :universal
   option "with-tests", "Build with unit tests"
   option "with-embedded", "Build the embedded server"
   option "with-libedit", "Compile with editline wrapper instead of readline"
-  option "enable-local-infile", "Build with local infile loading support"
+  option "with-local-infile", "Build with local infile loading support"
+
+  deprecated_option "enable-local-infile" => "with-local-infile"
+
+  depends_on "cmake" => :build
+  depends_on "readline"
+  depends_on "pidof"
+  depends_on "openssl"
 
   conflicts_with "mysql",
     :because => "percona-server55 and mysql install the same binaries."
@@ -70,7 +75,7 @@ class PerconaServer55 < Formula
       # PAM plugin is Linux-only at the moment
       "-DWITHOUT_AUTH_PAM=1",
       "-DWITHOUT_AUTH_PAM_COMPAT=1",
-      "-DWITHOUT_DIALOG=1"
+      "-DWITHOUT_DIALOG=1",
     ]
 
     # To enable unit testing at build, we need to download the unit testing suite
@@ -107,13 +112,13 @@ class PerconaServer55 < Formula
     ln_s prefix+"scripts/mysql_install_db", bin+"mysql_install_db"
 
     # Fix up the control script and link into bin
-    inreplace "#{prefix}/support-files/mysql.server" do |s|
-      s.gsub!(/^(PATH=".*)(")/, "\\1:#{HOMEBREW_PREFIX}/bin\\2")
-    end
+    inreplace "#{prefix}/support-files/mysql.server",
+      /^(PATH=".*)(")/, "\\1:#{HOMEBREW_PREFIX}/bin\\2"
 
     ln_s "#{prefix}/support-files/mysql.server", bin
 
     # Move mysqlaccess to libexec
+    libexec.mkpath
     mv "#{bin}/mysqlaccess", libexec
     mv "#{bin}/mysqlaccess.conf", libexec
   end

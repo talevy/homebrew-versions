@@ -19,6 +19,7 @@ class NoExpatFramework < Requirement
 end
 
 class Cmake31 < Formula
+  desc "Cross-platform make"
   homepage "http://www.cmake.org/"
   url "http://www.cmake.org/files/v3.1/cmake-3.1.3.tar.gz"
   sha256 "45f4d3fa8a2f61cc092ae461aac4cac1bab4ac6706f98274ea7f314dd315c6d0"
@@ -36,7 +37,6 @@ class Cmake31 < Formula
   depends_on "xz" # For LZMA
 
   conflicts_with "cmake", :because => "both install a cmake binary"
-  conflicts_with "cmake28", :because => "both install a cmake binary"
   conflicts_with "cmake30", :because => "both install a cmake binary"
 
   # The `with-qt` GUI option was removed due to circular dependencies if

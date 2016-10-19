@@ -19,14 +19,15 @@ class Gcc43 < Formula
     `uname -r`.chomp
   end
 
+  desc "GNU compiler collection"
   homepage "https://gcc.gnu.org"
-  url "http://ftpmirror.gnu.org/gcc/gcc-4.3.6/gcc-4.3.6.tar.bz2"
+  url "https://ftpmirror.gnu.org/gcc/gcc-4.3.6/gcc-4.3.6.tar.bz2"
   mirror "https://ftp.gnu.org/gnu/gcc/gcc-4.3.6/gcc-4.3.6.tar.bz2"
-  sha1 "df276018e3c664c7e6aa7ca88a180515eea61663"
+  sha256 "f3765cd4dcceb4d42d46f0d53471d7cedbad50f2112f0312c1dcc9c41eea9810"
 
   bottle do
-    sha1 "1b7ce5eff2095a1666acc03479343abe1b532eba" => :mavericks
-    sha1 "f926dc13742e51eb89308feddbc97aaa048d3d51" => :mountain_lion
+    sha256 "8bf79083ea4ad049f9c11a0bb2b46de64e54e9ae064c280e9af4b1cfdf44c912" => :mavericks
+    sha256 "99ea8382997d8c0d67a950d5fe26b79b18ec56dc359eb8ef3d0f16bbcb77d3d5" => :mountain_lion
   end
 
   option "with-fortran", "Build the gfortran compiler"
@@ -49,25 +50,25 @@ class Gcc43 < Formula
   # Fix building on darwin10
   patch :p0 do
     url "https://trac.macports.org/export/110576/trunk/dports/lang/gcc43/files/darwin10.diff"
-    sha1 "4119006a1fa18086431d3204db440750af668783"
+    sha256 "df1019b634f4e1b28c8a62f98374a1acc67e4540c65372fb87e84914d56c6daf"
   end
 
   # Fix multilib
   patch :p0 do
     url "https://trac.macports.org/export/110576/trunk/dports/lang/gcc43/files/i386_multilib.diff"
-    sha1 "040520aa92bc25c99f2daf85d81c10118363c8dd"
+    sha256 "e5e94df259db4cc5c14a61f2553fc1a496052cbd306d23ba95dccf9f01517795"
   end
 
   # Build fix for Snow Leopard
   patch :p0 do
     url "https://trac.macports.org/export/110576/trunk/dports/lang/gcc43/files/Make-lang.in.diff"
-    sha1 "d2420ea96789dcf8c3a6899dd3ad2a75876fd8e0"
+    sha256 "3e4e860b1a718fc43005681025448f7f6fd820f892a20419a723b887c588075e"
   end
 
   # Fix libffi fix for ppc
   patch :p0 do
     url "https://trac.macports.org/export/110576/trunk/dports/lang/gcc43/files/ppc_fde_encoding.diff"
-    sha1 "49e335d085567467155ea6512ffa959a18eab0ef"
+    sha256 "9c5f6fd30d089e97e0364af322272bb06f3d107f357d2b621503ebfbbb4a5af7"
   end
 
   fails_with :llvm
@@ -122,7 +123,7 @@ class Gcc43 < Formula
       # raise errors. But still a good idea to include.
       "--disable-werror",
       "--with-pkgversion=Homebrew #{name} #{pkg_version} #{build.used_options*" "}".strip,
-      "--with-bugurl=https://github.com/Homebrew/homebrew-versions/issues"
+      "--with-bugurl=https://github.com/Homebrew/homebrew-versions/issues",
     ]
 
     args << "--disable-nls" if build.without? "nls"
@@ -147,9 +148,9 @@ class Gcc43 < Formula
       if build.with? "profiled-build"
         # Takes longer to build, may bug out. Provided for those who want to
         # optimise all the way to 11.
-        system "make #{make_flags} profiledbootstrap"
+        system "make", make_flags, "profiledbootstrap"
       else
-        system "make #{make_flags} bootstrap"
+        system "make", make_flags, "bootstrap"
       end
 
       # At this point `make check` could be invoked to run the testsuite. The
@@ -175,7 +176,7 @@ class Gcc43 < Formula
         "#{lib}/logging.properties",
         "#{lib}/security/classpath.security",
         "#{lib}/i386/logging.properties",
-        "#{lib}/i386/security/classpath.security"
+        "#{lib}/i386/security/classpath.security",
       ]
 
       config_files.each do |file|

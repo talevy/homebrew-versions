@@ -4,8 +4,8 @@ class CodesignRequirement < Requirement
 
   satisfy(:build_env => false) do
     mktemp do
-      touch "llvm_check.txt"
-      quiet_system "/usr/bin/codesign", "-s", "lldb_codesign", "--dryrun", "llvm_check.txt"
+      cp "/usr/bin/false", "llvm_check"
+      quiet_system "/usr/bin/codesign", "-f", "-s", "lldb_codesign", "--dryrun", "llvm_check"
     end
   end
 
@@ -18,7 +18,7 @@ class CodesignRequirement < Requirement
 end
 
 class Llvm36 < Formula
-  desc "A modular and reusable compiler system"
+  desc "Modular and reusable compiler system"
   homepage "http://llvm.org/"
 
   stable do
@@ -69,9 +69,10 @@ class Llvm36 < Formula
   end
 
   bottle do
-    sha256 "2682bb82085611e6591ef98f9006fbcf0d90cfd5e57217a2bb460a217decc878" => :yosemite
-    sha256 "3baf01ebf2d3ed4eb6aaa77bda189f80359c11d081549e3418ad5507010343f4" => :mavericks
-    sha256 "501138751826f671f31a2ab77b58b749e179bc93df957655ca5a7fcb35c1972e" => :mountain_lion
+    rebuild 1
+    sha256 "6f30868fbf5b515118f5f856381ad093adf7f7caac3b2deb21441e71c12c98c8" => :el_capitan
+    sha256 "09504fc4a73dc6524ba5c8d3ac9f87bc07595203f7c49126808183f184275cab" => :yosemite
+    sha256 "6965cd67562a7b24fccc1d9baefc4f6f5656220d43ffbf86d2b50886c2cd807d" => :mavericks
   end
 
   head do
@@ -94,7 +95,7 @@ class Llvm36 < Formula
     end
 
     resource "lld" do
-      url "http://llvm.org/git/lld.git"
+      url "http://llvm.org/git/lld.git", :branch => "release_36"
     end
 
     resource "lldb" do
@@ -111,13 +112,6 @@ class Llvm36 < Formula
       end
     end
   end
-
-  resource "isl" do
-    url "http://isl.gforge.inria.fr/isl-0.14.1.tar.gz"
-    sha256 "bd15d06d050a92a6720fc7e2a58022a3fd1a73c4996cc358ba50864fd5e86c35"
-  end
-
-  patch :DATA
 
   option :universal
   option "with-lld", "Build LLD linker"
@@ -140,6 +134,13 @@ class Llvm36 < Formula
     depends_on "swig"
     depends_on CodesignRequirement
   end
+
+  resource "isl" do
+    url "http://isl.gforge.inria.fr/isl-0.14.1.tar.gz"
+    sha256 "bd15d06d050a92a6720fc7e2a58022a3fd1a73c4996cc358ba50864fd5e86c35"
+  end
+
+  patch :DATA
 
   # version suffix
   def ver

@@ -5,10 +5,10 @@ class Maven32 < Formula
   mirror "https://archive.apache.org/dist/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.tar.gz"
   sha256 "8c190264bdf591ff9f1268dc0ad940a2726f9e958e367716a09b8aaa7e74a755"
 
+  depends_on :java
+
   conflicts_with "maven", :because => "Differing versions of same formula"
   conflicts_with "mvnvm", :because => "Also installs a 'mvn' executable"
-
-  depends_on :java
 
   def install
     # Remove windows files
@@ -33,8 +33,8 @@ class Maven32 < Formula
   test do
     (testpath/"pom.xml").write <<-EOS.undent
       <?xml version="1.0" encoding="UTF-8"?>
-      <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+      <project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
         <modelVersion>4.0.0</modelVersion>
         <groupId>org.homebrew</groupId>
         <artifactId>maven-test</artifactId>

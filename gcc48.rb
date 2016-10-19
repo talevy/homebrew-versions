@@ -1,4 +1,5 @@
 class Gcc48 < Formula
+  desc "GNU compiler collection"
   def arch
     if Hardware::CPU.type == :intel
       if MacOS.prefer_64_bit?
@@ -20,24 +21,24 @@ class Gcc48 < Formula
   end
 
   homepage "https://gcc.gnu.org"
-  url "http://ftpmirror.gnu.org/gcc/gcc-4.8.4/gcc-4.8.4.tar.bz2"
-  mirror "https://ftp.gnu.org/gnu/gcc/gcc-4.8.4/gcc-4.8.4.tar.bz2"
-  sha256 "4a80aa23798b8e9b5793494b8c976b39b8d9aa2e53cd5ed5534aff662a7f8695"
+  url "https://ftpmirror.gnu.org/gcc/gcc-4.8.5/gcc-4.8.5.tar.bz2"
+  mirror "https://ftp.gnu.org/gnu/gcc/gcc-4.8.5/gcc-4.8.5.tar.bz2"
+  sha256 "22fb1e7e0f68a63cee631d85b20461d1ea6bda162f03096350e38c8d427ecf23"
 
   head "svn://gcc.gnu.org/svn/gcc/branches/gcc-4_8-branch"
 
   bottle do
-    revision 2
-    sha256 "845912e98601c81ffe185cbde8b9f8af3b689b5de6bcca07c60a93f76354e366" => :el_capitan
-    sha256 "c6080201c7b306fcbe6b3d0c0664d355ff6c0b46751637555f969fd4ec6bff98" => :yosemite
-    sha256 "ef0d90237d1cf8fd6b835b11a45677c172189088764045166095591623fa0a33" => :mavericks
+    rebuild 1
+    sha256 "8cf53c3b1f03049538b9f78ea1ffe7ebf21fcc99a3b4147e4ede8defefc4cef4" => :el_capitan
+    sha256 "ae30faa242deae02d46bc92a318e0f0b8f6f0754521fec2225c2fb0403022e31" => :yosemite
+    sha256 "0bc974cb0c23ed4ca3536eb2b5e7f11e692a5e6246d99b82ad74880685f42736" => :mavericks
   end
 
   if MacOS.version >= :yosemite
     # Fixes build on El Capitan
     # https://trac.macports.org/ticket/48471
     patch :p0 do
-      url "https://raw.githubusercontent.com/Homebrew/patches/dcfc5a2e6/gcc48/define_non_standard_clang_macros.patch"
+      url "https://raw.githubusercontent.com/Homebrew/formula-patches/dcfc5a2e6/gcc48/define_non_standard_clang_macros.patch"
       sha256 "e727383c9186fdc36f804c69ad550f5cfd2b996e37083be94c0c9aa8fde226ee"
     end
     # Fixes build with Xcode 7.
@@ -48,7 +49,7 @@ class Gcc48 < Formula
     end
   end
 
-  option "with-fortran", "Build the gfortran compiler"
+  option "without-fortran", "Build without the gfortran compiler"
   option "with-java", "Build the gcj compiler"
   option "with-all-languages", "Enable all compilers and languages, except Ada"
   option "with-nls", "Build with native language support (localization)"
@@ -56,7 +57,6 @@ class Gcc48 < Formula
   # enabling multilib on a host that can't run 64-bit results in build failures
   option "without-multilib", "Build without multilib support" if MacOS.prefer_64_bit?
 
-  deprecated_option "enable-fortran" => "with-fortran"
   deprecated_option "enable-java" => "with-java"
   deprecated_option "enable-all-languages" => "with-all-languages"
   deprecated_option "enable-nls" => "with-nls"

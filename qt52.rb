@@ -1,12 +1,12 @@
 class Qt52 < Formula
+  desc "Cross-platform application and UI framework"
   homepage "https://www.qt.io/"
   url "https://download.qt.io/official_releases/qt/5.2/5.2.1/single/qt-everywhere-opensource-src-5.2.1.tar.gz"
   sha256 "84e924181d4ad6db00239d87250cc89868484a14841f77fb85ab1f1dbdcd7da1"
 
   bottle do
-    sha256 "5704fa2d665f5185ea25012ef2dbece9ab64507a72226d1f6d5e84f0c18ba2ae" => :yosemite
-    sha256 "fcaad4e34400587f5836e3ac6e7d643d8d430a738f23879de5e530ac4c77eecb" => :mavericks
-    sha256 "e0e2e057186950d7163c40d358c9fba035eac766f3d0c0ec07a87821e3608fde" => :mountain_lion
+    rebuild 1
+    sha256 "daaaa01ffcd89cf498b54b4e505e8e8271a636d38610cd636ae605ebd80bc47f" => :mavericks
   end
 
   keg_only "Qt 5 conflicts Qt 4 (which is currently much more widely used)."
@@ -16,10 +16,12 @@ class Qt52 < Formula
   option "with-developer", "Build and link with developer options"
 
   deprecated_option "developer" => "with-developer"
+  deprecated_option "with-d-bus" => "with-dbus"
 
   depends_on "pkg-config" => :build
   depends_on :xcode => :build
-  depends_on "d-bus" => :optional
+  depends_on MaximumMacOSRequirement => :mavericks
+  depends_on "dbus" => :optional
   depends_on "mysql" => :optional
 
   # Fails to build miserably on Xcodes which contain the 10.10 SDK
@@ -44,8 +46,8 @@ class Qt52 < Formula
 
     args << "-plugin-sql-mysql" if build.with? "mysql"
 
-    if build.with? "d-bus"
-      dbus_opt = Formula["d-bus"].opt_prefix
+    if build.with? "dbus"
+      dbus_opt = Formula["dbus"].opt_prefix
       args << "-I#{dbus_opt}/lib/dbus-1.0/include"
       args << "-I#{dbus_opt}/include/dbus-1.0"
       args << "-L#{dbus_opt}/lib"
@@ -91,14 +93,14 @@ class Qt52 < Formula
     Pathname.glob("#{bin}/*.app") { |app| mv app, prefix }
   end
 
-  test do
-    system "#{bin}/qmake", "-project"
-  end
-
   def caveats; <<-EOS.undent
     We agreed to the Qt opensource license for you.
     If this is unacceptable you should uninstall.
     EOS
+  end
+
+  test do
+    system "#{bin}/qmake", "-project"
   end
 end
 

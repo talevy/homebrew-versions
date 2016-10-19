@@ -1,4 +1,5 @@
 class Libotr4 < Formula
+  desc "Off-The-Record (OTR) messaging library"
   homepage "https://otr.cypherpunks.ca/"
   url "https://otr.cypherpunks.ca/libotr-4.0.0.tar.gz"
   sha256 "3f911994409898e74527730745ef35ed75c352c695a1822a677a34b2cf0293b4"
@@ -11,6 +12,8 @@ class Libotr4 < Formula
   end
 
   depends_on "libgcrypt"
+
+  conflicts_with "libotr", :because => "Differing version of same formula."
 
   def install
     system "./configure", "--disable-dependency-tracking",

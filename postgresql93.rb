@@ -1,14 +1,16 @@
 class Postgresql93 < Formula
   desc "Object-relational database system"
   homepage "http://www.postgresql.org/"
-  url "http://ftp.postgresql.org/pub/source/v9.3.9/postgresql-9.3.9.tar.bz2"
-  sha256 "f73bd0ec2028511732430beb22414a022d2114231366e8cbe78c149793910549"
+  url "https://ftp.postgresql.org/pub/source/v9.3.14/postgresql-9.3.14.tar.bz2"
+  sha256 "5c4322f1c42ba1ff4b28383069c56663b46160bb08e85d41fa2ab9a5009d039d"
 
   bottle do
-    sha256 "70ea1f08bfc9b37df07074e103726a0f4ca13a28898bc849f09556b8ceca732c" => :yosemite
-    sha256 "f4bd484e2bf510a2b1e1b413a79496ffd3250e501f61af87738aed827181a6ea" => :mavericks
-    sha256 "a029295e7590100d8d2d902266cbffa36a2baff5014ff1515f96470c6f4cf99d" => :mountain_lion
+    sha256 "7651b316bf36d3d432c7634dea78ddb398b10ce7610afecffe90d0016d994aea" => :sierra
+    sha256 "0470ec5e1ec0dc45a18893d3e513c8ac404fc52aa6281b23c800cc8d017a9767" => :el_capitan
+    sha256 "a9ba2cc6ae74320a10be40d42c4a75989d38fce99232c032026ae60d275525b6" => :yosemite
   end
+
+  revision 1
 
   option "32-bit"
   option "without-perl", "Build without Perl support"
@@ -38,6 +40,9 @@ class Postgresql93 < Formula
 
   def install
     ENV.libxml2 if MacOS.version >= :snow_leopard
+
+    ENV.prepend "LDFLAGS", "-L#{Formula["openssl"].opt_lib} -L#{Formula["readline"].opt_lib}"
+    ENV.prepend "CPPFLAGS", "-I#{Formula["openssl"].opt_include} -I#{Formula["readline"].opt_include}"
 
     args = %W[
       --disable-debug
@@ -83,12 +88,16 @@ class Postgresql93 < Formula
     system "make", "install-world"
   end
 
+  def post_install
+    (var/"log").mkpath
+    (var/"postgres").mkpath
+    unless File.exist? "#{var}/postgres/PG_VERSION"
+      system "#{bin}/initdb", "#{var}/postgres"
+    end
+  end
+
   def caveats
     s = <<-EOS.undent
-    initdb #{var}/postgres -E utf8    # create a database
-    postgres -D #{var}/postgres       # serve that database
-    PGDATA=#{var}/postgres postgres   # ...alternatively
-
     If builds of PostgreSQL 9 are failing and you have version 8.x installed,
     you may need to remove the previous version first. See:
       https://github.com/Homebrew/homebrew/issues/issue/2510
@@ -126,15 +135,13 @@ class Postgresql93 < Formula
         <string>#{opt_bin}/postgres</string>
         <string>-D</string>
         <string>#{var}/postgres</string>
-        <string>-r</string>
-        <string>#{var}/postgres/server.log</string>
       </array>
       <key>RunAtLoad</key>
       <true/>
       <key>WorkingDirectory</key>
       <string>#{HOMEBREW_PREFIX}</string>
       <key>StandardErrorPath</key>
-      <string>#{var}/postgres/server.log</string>
+      <string>#{var}/log/postgres.log</string>
     </dict>
     </plist>
     EOS

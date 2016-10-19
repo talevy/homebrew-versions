@@ -1,13 +1,14 @@
 class Libpqxx3 < Formula
+  desc "C++ connector for PostgreSQL"
   homepage "http://pqxx.org/development/libpqxx/"
   url "http://pqxx.org/download/software/libpqxx/libpqxx-3.1.1.tar.gz"
-  sha1 "b8942164495310894cab39e5882c42f092570fc5"
+  sha256 "ce443c7c515623b4a68de5f0657460344b6b6320982d8f8efc657c3746e1ee90"
 
   bottle do
     cellar :any
-    sha1 "4b252768206da1560e33af4baefb689f475556a8" => :yosemite
-    sha1 "4b9dbfb332c12c1b8b8b16fff11a66d2b5ad9621" => :mavericks
-    sha1 "e968d6871cc9e35c709d15eaa6c8704fe84c6a12" => :mountain_lion
+    sha256 "5ee9ebd4b524601f6af244f2bea9b1a205db569ec8d3e895b8c93aa6e565280d" => :yosemite
+    sha256 "f568487e046b03b022dc87152ca74ad4b6c1f6a8048f670437d4983d2cd967bd" => :mavericks
+    sha256 "b4a1fa555cc0d804eac4a45b101dda02bbef3744efa52de8a3d63711fac4c34e" => :mountain_lion
   end
 
   depends_on "pkg-config" => :build

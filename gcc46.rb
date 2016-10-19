@@ -19,15 +19,16 @@ class Gcc46 < Formula
     `uname -r`.chomp
   end
 
+  desc "GNU compiler collection"
   homepage "https://gcc.gnu.org"
-  url "http://ftpmirror.gnu.org/gcc/gcc-4.6.4/gcc-4.6.4.tar.bz2"
+  url "https://ftpmirror.gnu.org/gcc/gcc-4.6.4/gcc-4.6.4.tar.bz2"
   mirror "https://ftp.gnu.org/gnu/gcc/gcc-4.6.4/gcc-4.6.4.tar.bz2"
-  sha1 "63933a8a5cf725626585dbba993c8b0f6db1335d"
+  sha256 "35af16afa0b67af9b8eb15cafb76d2bc5f568540552522f5dc2c88dd45d977e8"
 
   bottle do
-    sha1 "9dcb96abaa4f6c58a7d989147f4c3fade49fdfc3" => :yosemite
-    sha1 "7a695d2c558a761b5f6c6166197eb37546bfb846" => :mavericks
-    sha1 "16fae71675757818526e7e73007fe5b8d8e99c7d" => :mountain_lion
+    sha256 "23cb970d350f9096b17ad0a04c875d0c54ee71a0f22709e72bcf34e100412dfc" => :yosemite
+    sha256 "51a8a0efb2868c517258d2a504c45217fed8a10631ba724da437adb39064a632" => :mavericks
+    sha256 "8033c9313bf08a7bc825aca65c884027a877052b77418d9fcf1006dd27ac2287" => :mountain_lion
   end
 
   if MacOS.version >= :el_capitan
@@ -75,7 +76,7 @@ class Gcc46 < Formula
   # Fix 10.10 issues: https://gcc.gnu.org/viewcvs/gcc?view=revision&revision=215251
   patch :p0 do
     url "https://trac.macports.org/export/126996/trunk/dports/lang/gcc48/files/patch-10.10.diff"
-    sha1 "4fb0ededa7b8105c3bdffa15469b589b272b7788"
+    sha256 "61e5d0f18db59220cbd99717e9b644c1d0f3502b09ada746b60850cacda07328"
   end
 
   def install

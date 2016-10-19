@@ -1,14 +1,13 @@
 class Mysql55 < Formula
   desc "Open source relational database management system"
   homepage "http://dev.mysql.com/doc/refman/5.5/en/"
-  url "https://dev.mysql.com/get/Downloads/MySQL-5.5/mysql-5.5.44.tar.gz"
-  sha256 "85f05b257db39e63c82ff4b5ce4e0c6d2b07560b5fc1646d47d7ae48eab3e5de"
+  url "https://dev.mysql.com/get/Downloads/MySQL-5.5/mysql-5.5.49.tar.gz"
+  sha256 "cd9ca49b01a76bca635f2888b9d4d30fa6583dd198994d407cdd0dd7170e9e1f"
 
   bottle do
-    revision 2
-    sha256 "eeacb7aba73191733f822f8e20bf19b220becca116120d3d1aeb9ec82d0d17bb" => :yosemite
-    sha256 "0059b640fb7c4c02b485423e7135f0d4d30cda7c21533d16d460a9cf5deb2e87" => :mavericks
-    sha256 "e2446972a03786904fbdc1e0388ebedb62f58dcc29b117d1eb8feed8b145d147" => :mountain_lion
+    sha256 "6851b9904d7bb3110644b41da07ccb9e0c3d1adc318421c6421413172fc03fde" => :el_capitan
+    sha256 "d97229c5f2ae68874f3d9e9b898d59e6425414efa613fc969097d1b87f28da6b" => :yosemite
+    sha256 "87e1dccfa4d143f6a3604f2fe1c4402bd72e71ed2f40963e8329efe07e242633" => :mavericks
   end
 
   option :universal
@@ -173,7 +172,7 @@ class Mysql55 < Formula
 
   test do
     (prefix/"mysql-test").cd do
-      system "./mysql-test-run.pl", "status"
+      system "./mysql-test-run.pl", "status", "--vardir=#{testpath}"
     end
   end
 end
